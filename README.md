@@ -202,4 +202,4 @@ python main.py
 
 ## License
 
-[MIT License](LICENSE) 
+MIT Licence
