@@ -43,11 +43,11 @@ ExtendAI is a universal framework that can extend any AI model to achieve multi-
 
 ## Screenshots
 <div align="center">
-  <img src="https://github.com/user-attachments/assets/5f107c04-89ee-46b0-9f22-906fe420ab41" width="600" alt="ExtendAI Screenshot 1" />
+  <img src="https://github.com/user-attachments/assets/5f107c04-89ee-46b0-9f22-906fe420ab41" width="800" alt="ExtendAI Screenshot 1" />
   <br/><br/>
-  <img src="https://github.com/user-attachments/assets/b96b948e-4be3-42a9-9a4c-bf93d2e75ebd" width="600" alt="ExtendAI Screenshot 2" />
+  <img src="https://github.com/user-attachments/assets/b96b948e-4be3-42a9-9a4c-bf93d2e75ebd" width="800" alt="ExtendAI Screenshot 2" />
   <br/><br/>
-  <img src="https://github.com/user-attachments/assets/988419ce-9824-44cd-abf8-fbb27162ce83" width="600" alt="ExtendAI Screenshot 3" />
+  <img src="https://github.com/user-attachments/assets/988419ce-9824-44cd-abf8-fbb27162ce83" width="800" alt="ExtendAI Screenshot 3" />
 </div>
 
 ## Configuration
@@ -311,4 +311,4 @@ data: [DONE]
 
 ## License
 
-MIT Licence
+MIT License
