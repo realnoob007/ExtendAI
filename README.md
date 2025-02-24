@@ -41,6 +41,15 @@ ExtendAI is a universal framework that can extend any AI model to achieve multi-
   - Automatic cleanup of temporary files
   - Cache invalidation and management
 
+## Screenshots
+<div align="center">
+  <img src="https://github.com/user-attachments/assets/5f107c04-89ee-46b0-9f22-906fe420ab41" width="800" alt="ExtendAI Screenshot 1" />
+  <br/><br/>
+  <img src="https://github.com/user-attachments/assets/b96b948e-4be3-42a9-9a4c-bf93d2e75ebd" width="800" alt="ExtendAI Screenshot 2" />
+  <br/><br/>
+  <img src="https://github.com/user-attachments/assets/988419ce-9824-44cd-abf8-fbb27162ce83" width="800" alt="ExtendAI Screenshot 3" />
+</div>
+
 ## Configuration
 
 The system is highly configurable through environment variables:
@@ -115,6 +124,7 @@ PROGRESS_MSG_WEB_SEARCH="Searching web content..."   # Message shown during web 
 ## Advanced Configuration Details
 
 ### Document Processing
+- OpenAI format, just need to pass the document url through image_url parameter
 - The chunking system breaks down documents into manageable pieces while maintaining context through overlap
 - Batch processing helps optimize embedding generation and API usage
 - File size limits protect against resource exhaustion and API limitations
@@ -192,6 +202,105 @@ python main.py
 - `app/core/`: Core system components
 - `app/config/`: Configuration management
 
+#### Example Request Payload (Post Request to http://0.0.0.0:8096/v1/chat/completions)
+```json
+{
+    "messages": [
+      {
+        "role": "user",
+        "content": [
+          {
+            "type": "text",
+            "text": "what is this document about?"
+          },
+          {
+            "type": "image_url",
+            "image_url": {
+              "url": "https://xxx.com/document.pdf"
+            }
+          }
+        ]
+      }
+    ],
+    "model": "deepseek-r1-all",
+    "stream": false
+}
+```
+
+#### Content Types Support
+The API supports multiple content types in messages:
+
+1. **Text Content**
+```json
+{
+    "type": "text",
+    "text": "your question or prompt here"
+}
+```
+
+2. **Image URL**
+```json
+{
+    "type": "image_url",
+    "image_url": {
+        "url": "https://example.com/image.jpg"
+    }
+}
+```
+
+3. **Document URL**
+```json
+{
+    "type": "image_url",
+    "image_url": {
+        "url": "https://example.com/document.pdf"
+    }
+}
+```
+
+#### Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| messages | array | Yes | Array of message objects |
+| model | string | No | Model to use (default: deepseek-r1) |
+| stream | boolean | No | Whether to stream the response (default: false) |
+
+#### Non-Streaming Response
+```json
+{
+    "id": "chatcmpl-123",
+    "object": "chat.completion",
+    "created": 1677858242,
+    "model": "deepseek-r1-all",
+    "usage": {
+        "prompt_tokens": 56,
+        "completion_tokens": 31,
+        "total_tokens": 87
+    },
+    "choices": [
+        {
+            "message": {
+                "role": "assistant",
+                "content": "The document appears to be about..."
+            },
+            "finish_reason": "stop",
+            "index": 0
+        }
+    ]
+}
+```
+
+#### Streaming Response
+When `stream` is set to `true`, the response will be sent as Server-Sent Events (SSE):
+```http
+data: {"id":"chatcmpl-123","object":"chat.completion.chunk","created":1677858242,"model":"deepseek-r1-all","choices":[{"delta":{"role":"assistant","content":"The"},"index":0,"finish_reason":null}]}
+
+data: {"id":"chatcmpl-123","object":"chat.completion.chunk","created":1677858242,"model":"deepseek-r1-all","choices":[{"delta":{"content":" document"},"index":0,"finish_reason":null}]}
+
+data: [DONE]
+```
+
 ## Contributing
 
 1. Fork the repository
@@ -202,4 +311,4 @@ python main.py
 
 ## License
 
-MIT Licence
+MIT License
