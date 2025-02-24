@@ -1,0 +1,61 @@
+version: "3"
+name: extendai
+
+services:
+  app:
+    build: .
+    ports:
+      - "8096:8096"
+    env_file:
+      - .env
+    environment:
+      # Default settings that will be overridden by .env file if present
+      VECTOR_STORE_TYPE: ${VECTOR_STORE_TYPE:-postgres}
+      POSTGRES_CONNECTION_STRING: ${POSTGRES_CONNECTION_STRING:-postgresql://extendai:extendai@pgvector:5432/extendai}
+      POSTGRES_COLLECTION_NAME: ${POSTGRES_COLLECTION_NAME:-embeddings}
+      ENABLE_IMAGE_ANALYSIS: ${ENABLE_IMAGE_ANALYSIS:-true}
+      ENABLE_WEB_SEARCH: ${ENABLE_WEB_SEARCH:-true}
+      ENABLE_DOCUMENT_ANALYSIS: ${ENABLE_DOCUMENT_ANALYSIS:-true}
+    depends_on:
+      pgvector:
+        condition: service_healthy
+    volumes:
+      - ./cache:/app/cache
+      - ./.env:/app/.env:ro  # Mount .env file as read-only
+
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: extendai
+      POSTGRES_USER: extendai
+      POSTGRES_PASSWORD: extendai
+    ports:
+      - "6023:5432"
+    command: postgres -c log_statement=all
+    healthcheck:
+      test: ["CMD-SHELL", "psql postgresql://extendai:extendai@localhost/extendai --command 'SELECT 1;' || exit 1"]
+      interval: 5s
+      retries: 60
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  pgvector:
+    image: ankane/pgvector
+    environment:
+      POSTGRES_DB: extendai
+      POSTGRES_USER: extendai
+      POSTGRES_PASSWORD: extendai
+    ports:
+      - "6024:5432"
+    command: postgres -c log_statement=all
+    healthcheck:
+      test: ["CMD-SHELL", "psql postgresql://extendai:extendai@localhost/extendai --command 'SELECT 1;' || exit 1"]
+      interval: 5s
+      retries: 60
+    volumes:
+      - postgres_data_pgvector:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
+  postgres_data_pgvector:
+  cache: 

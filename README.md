@@ -175,32 +175,106 @@ PROGRESS_MSG_WEB_SEARCH="Searching web content..."   # Message shown during web 
 - Feature toggles for different capabilities
 - Localization support for messages
 
-## Installation
+## Installation & Deployment
+
+### Option 1: Docker Compose (Recommended for Production)
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/yourusername/ExtendAI.git
+git clone https://github.com/realnoob007/ExtendAI.git
 cd ExtendAI
 ```
 
-2. Create a virtual environment and activate it (highly suggest to use python 3.11 or above):
+2. Set up environment variables:
+```bash
+cp .env.example .env
+# Edit .env with your configuration (API keys, model endpoints, etc.)
+```
+
+3. Start the services using Docker Compose:
+```bash
+docker compose up -d
+```
+
+This will start:
+- ExtendAI application on port 8096
+- PostgreSQL database on port 6023
+- PostgreSQL with pgvector extension on port 6024
+
+To view logs:
+```bash
+docker compose logs -f
+```
+
+To stop the services:
+```bash
+docker compose down
+```
+
+### Option 2: Docker (Single Container)
+
+If you want to run only the ExtendAI application container and use external databases:
+
+1. Clone and configure:
+```bash
+git clone https://github.com/realnoob007/ExtendAI.git
+cd ExtendAI
+cp .env.example .env
+# Edit .env with your configuration
+```
+
+2. Build and run the container:
+```bash
+# Build the image
+docker build -t extendai .
+
+# Run the container
+docker run -d \
+  --name extendai \
+  -p 8096:8096 \
+  --env-file .env \
+  -v $(pwd)/cache:/app/cache \
+  -v $(pwd)/.env:/app/.env:ro \
+  extendai
+```
+
+Useful Docker commands:
+```bash
+# View logs
+docker logs -f extendai
+
+# Stop container
+docker stop extendai
+
+# Remove container
+docker rm extendai
+
+# Rebuild image (if you made changes)
+docker build --no-cache -t extendai .
+```
+
+### Option 3: Local Development
+
+For development purposes, you can run the application directly:
+
+1. Create a virtual environment (Python 3.11+ recommended):
 ```bash
 python -m venv venv
 source venv/bin/activate  # On Windows: venv\Scripts\activate
 ```
 
-3. Install dependencies:
+2. Install dependencies:
 ```bash
 pip install -r requirements.txt
 ```
 
-4. Set up environment variables:
+3. Set up environment variables:
 ```bash
 cp .env.example .env
 # Edit .env with your configuration
 ```
 
-5. Run the application:
+4. Run the application:
 ```bash
 python main.py
 ```
