@@ -22,6 +22,21 @@ ExtendAI is a universal framework that can extend any AI model to achieve multi-
   - Efficient batch processing of large documents
   - File type detection based on content and extensions
 
+- **Intelligent Web Search**:
+  - Integration with multiple search engines (Google, Bing)
+  - SearXNG support for privacy-focused searches
+  - Smart result filtering and ranking
+  - Configurable search depth and limits
+  - Automatic content extraction and processing
+
+- **Advanced Image Comprehension**:
+  - Deep image analysis and understanding
+  - Object and scene detection
+  - Text extraction from images (OCR)
+  - Image content description
+  - Support for multiple image formats
+  - Context-aware image interpretation
+
 - **Flexible Vector Store Integration**:
   - PostgreSQL vector store support
   - Pinecone vector store support
