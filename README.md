@@ -228,19 +228,15 @@ cp .env.example .env
 # Edit .env with your configuration
 ```
 
-2. Build and run the container:
+2. Run the container:
 ```bash
-# Build the image
-docker build -t extendai .
-
-# Run the container
 docker run -d \
   --name extendai \
   -p 8096:8096 \
   --env-file .env \
   -v $(pwd)/cache:/app/cache \
   -v $(pwd)/.env:/app/.env:ro \
-  extendai
+  chasney/extendai:latest
 ```
 
 Useful Docker commands:
