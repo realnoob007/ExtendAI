@@ -402,6 +402,9 @@ data: [DONE]
 4. Push to the branch
 5. Create a Pull Request
 
+## Sponsorship (You can run this project with this api platform to save 20%)
+[PlanetZero API](https://api.planetzeroapi.com/)
+
 ## License
 
 MIT License
