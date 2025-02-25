@@ -6,7 +6,8 @@ from app.utils.file_utils import is_base64
 
 from app.config.settings import (
     OPENAI_API_URL, OPENAI_API_KEY,
-    API_TIMEOUT, MAX_IMAGE_SIZE
+    API_TIMEOUT, MAX_IMAGE_SIZE,
+    OPENAI_ENHANCE_MODEL
 )
 
 logger = logging.getLogger(__name__)
@@ -48,7 +49,7 @@ async def process_image(image_url: str) -> str:
                 response = await client.post(
                     OPENAI_API_URL,
                     json={
-                        "model": "gpt-4o-mini",
+                        "model": OPENAI_ENHANCE_MODEL,
                         "messages": [{
                             "role": "user",
                             "content": [{
@@ -88,7 +89,7 @@ async def process_image(image_url: str) -> str:
             response = await client.post(
                 OPENAI_API_URL,
                 json={
-                    "model": "gpt-4o-mini",
+                    "model": OPENAI_ENHANCE_MODEL,
                     "messages": [{
                         "role": "user",
                         "content": [{

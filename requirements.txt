@@ -25,3 +25,4 @@ markdown>=3.5.0
 docstring-parser>=0.15
 tqdm>=4.66.0
 googlesearch-python
+cachetools

@@ -71,6 +71,7 @@ TARGET_MODEL_API_KEY = os.getenv("TARGET_MODEL_API_KEY")
 OPENAI_BASE_URL = os.getenv("OPENAI_BASE_URL", "https://api.openai.com")
 OPENAI_API_URL = f"{OPENAI_BASE_URL}/v1/chat/completions"
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+OPENAI_ENHANCE_MODEL = os.getenv("OPENAI_ENHANCE_MODEL")  # Model for image/document enhancement
 
 # Embedding Settings
 EMBEDDING_BASE_URL = os.getenv("EMBEDDING_BASE_URL", "https://api.openai.com/v1")
