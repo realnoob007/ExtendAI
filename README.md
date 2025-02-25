@@ -101,6 +101,7 @@ TARGET_MODEL_BASE_URL=        # Base URL for the target AI model API
 TARGET_MODEL_API_KEY=         # API key for the target model
 OPENAI_BASE_URL=             # Base URL for OpenAI API (or compatible endpoint)
 OPENAI_API_KEY=              # OpenAI API key (or compatible key)
+OPENAI_ENHANCE_MODEL=        # The model used to facilitate image processing and search analysis
 
 # Embedding API Settings
 EMBEDDING_BASE_URL=          # Base URL for embedding API
