@@ -18,8 +18,9 @@ ExtendAI is a universal framework that can extend any AI model to achieve multi-
 
 - **Advanced Document Processing**:
   - Automatic text encoding detection and fixing
+  - Mutiple Documents Batch Processing
   - Smart document chunking with configurable size and overlap
-  - Efficient batch processing of large documents
+  - Ultra fast processing of large documents
   - File type detection based on content and extensions
 
 - **Intelligent Web Search**:
@@ -31,9 +32,8 @@ ExtendAI is a universal framework that can extend any AI model to achieve multi-
 
 - **Advanced Image Comprehension**:
   - Deep image analysis and understanding
-  - Object and scene detection
+  - Mutiple Images Batch Processing
   - Text extraction from images (OCR)
-  - Image content description
   - Support for multiple image formats
   - Context-aware image interpretation
 
@@ -60,9 +60,10 @@ ExtendAI is a universal framework that can extend any AI model to achieve multi-
 <div align="center">
   <img src="https://github.com/user-attachments/assets/5f107c04-89ee-46b0-9f22-906fe420ab41" width="800" alt="ExtendAI Screenshot 1" />
   <br/><br/>
-  <img src="https://github.com/user-attachments/assets/b96b948e-4be3-42a9-9a4c-bf93d2e75ebd" width="800" alt="ExtendAI Screenshot 2" />
+  <img src="https://github.com/user-attachments/assets/b5c558b9-9f23-479e-ae42-1c7e5ebb82d8" width="800" alt="ExtendAI Screenshot 2" />
   <br/><br/>
   <img src="https://github.com/user-attachments/assets/988419ce-9824-44cd-abf8-fbb27162ce83" width="800" alt="ExtendAI Screenshot 3" />
+
 </div>
 
 ## Configuration
@@ -92,11 +93,15 @@ PINECONE_INDEX_NAME=          # Name of the Pinecone index to use
 VECTOR_CACHE_DIR=cache/vectors # Directory for storing FAISS vector cache
 VECTOR_CACHE_TTL=7200         # Cache time-to-live in seconds (2 hours)
 
+API_TIMEOUT=600                    # API Timeout (in seconds)
+MY_API_KEY=sk-planetzero-api-key   # Authorization key
+
 # Model API Settings
 TARGET_MODEL_BASE_URL=        # Base URL for the target AI model API
 TARGET_MODEL_API_KEY=         # API key for the target model
 OPENAI_BASE_URL=             # Base URL for OpenAI API (or compatible endpoint)
 OPENAI_API_KEY=              # OpenAI API key (or compatible key)
+OPENAI_ENHANCE_MODEL=        # The model used to facilitate image processing and search analysis
 
 # Embedding API Settings
 EMBEDDING_BASE_URL=          # Base URL for embedding API
@@ -223,19 +228,15 @@ cp .env.example .env
 # Edit .env with your configuration
 ```
 
-2. Build and run the container:
+2. Run the container:
 ```bash
-# Build the image
-docker build -t extendai .
-
-# Run the container
 docker run -d \
   --name extendai \
   -p 8096:8096 \
   --env-file .env \
   -v $(pwd)/cache:/app/cache \
   -v $(pwd)/.env:/app/.env:ro \
-  extendai
+  chasney/extendai:latest
 ```
 
 Useful Docker commands:
@@ -397,6 +398,9 @@ data: [DONE]
 3. Commit your changes
 4. Push to the branch
 5. Create a Pull Request
+
+## Sponsorship (You can run this project with this api platform to save 20%)
+[PlanetZero API](https://api.planetzeroapi.com/)
 
 ## License
 
