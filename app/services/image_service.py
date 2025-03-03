@@ -44,34 +44,13 @@ async def process_image(image_url: str) -> str:
                 logger.error(f"Error decoding base64 data: {str(e)}")
                 raise HTTPException(status_code=400, detail="Invalid base64 image data")
             
-            # Process base64 image directly
-            async with httpx.AsyncClient() as client:
-                response = await client.post(
-                    OPENAI_API_URL,
-                    json={
-                        "model": OPENAI_ENHANCE_MODEL,
-                        "messages": [{
-                            "role": "user",
-                            "content": [{
-                                "type": "text",
-                                "text": "Only output the ocr result of user's uploaded image. If the image contains data structures like a graph or table, convert the info into text. If this is a image of an object, describe it as detailed as possible."
-                            }, {
-                                "type": "image_url",
-                                "image_url": {"url": image_url}
-                            }]
-                        }],
-                        "stream": False
-                    },
-                    headers=get_headers(OPENAI_API_KEY),
-                    timeout=API_TIMEOUT
-                )
-                response.raise_for_status()
-                result = response.json()
-                return result.get("choices", [{}])[0].get("message", {}).get("content", "")
-        
-        # Handle regular URL
-        async with httpx.AsyncClient() as client:
-            # Set headers for S3 presigned URLs
+            image_data = image_url
+        else:
+            # Handle regular URL
+            # Check if this is an S3 presigned URL
+            is_s3_url = "X-Amz-Algorithm=AWS4-HMAC-SHA256" in image_url and "X-Amz-Credential" in image_url
+            
+            # Set headers based on URL type
             headers = {
                 "Accept": "*/*",
                 "Accept-Encoding": "gzip, deflate",
@@ -79,50 +58,84 @@ async def process_image(image_url: str) -> str:
                 "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
             }
             
-            # First check image size with HEAD request
-            head_response = await client.head(
-                image_url,
-                headers=headers,
-                follow_redirects=True
-            )
-            head_response.raise_for_status()
-            
-            # Check content length if available
-            content_length = head_response.headers.get("content-length")
-            if content_length:
-                file_size = int(content_length)
-                if file_size > MAX_IMAGE_SIZE:
-                    raise HTTPException(
-                        status_code=413,
-                        detail=f"Image size ({file_size} bytes) exceeds maximum allowed size ({MAX_IMAGE_SIZE} bytes)"
+            async with httpx.AsyncClient() as client:
+                if is_s3_url:
+                    # For S3 presigned URLs, skip HEAD request and directly download
+                    response = await client.get(
+                        image_url,
+                        headers=headers,
+                        follow_redirects=True
                     )
+                    response.raise_for_status()
+                    
+                    # Check content length after download
+                    image_bytes = response.content
+                    if len(image_bytes) > MAX_IMAGE_SIZE:
+                        raise HTTPException(
+                            status_code=413,
+                            detail=f"Image size ({len(image_bytes)} bytes) exceeds maximum allowed size ({MAX_IMAGE_SIZE} bytes)"
+                        )
+                    
+                    # Detect content type
+                    content_type = response.headers.get("content-type", "image/jpeg")
+                    if not content_type.startswith("image/"):
+                        content_type = "image/jpeg"  # Default to jpeg if no valid content type
+                    
+                    # Create data URI
+                    image_data = f"data:{content_type};base64,{base64.b64encode(image_bytes).decode()}"
+                else:
+                    # For regular URLs, do HEAD request first
+                    head_response = await client.head(
+                        image_url,
+                        headers=headers,
+                        follow_redirects=True
+                    )
+                    head_response.raise_for_status()
+                    
+                    # Check content length if available
+                    content_length = head_response.headers.get("content-length")
+                    if content_length:
+                        file_size = int(content_length)
+                        if file_size > MAX_IMAGE_SIZE:
+                            raise HTTPException(
+                                status_code=413,
+                                detail=f"Image size ({file_size} bytes) exceeds maximum allowed size ({MAX_IMAGE_SIZE} bytes)"
+                            )
+                    
+                    # For regular URLs, pass the URL directly
+                    image_data = image_url
+        
+        # Process image with OpenAI
+        async with httpx.AsyncClient() as client:
+            openai_request = {
+                "model": OPENAI_ENHANCE_MODEL,
+                "messages": [{
+                    "role": "user",
+                    "content": [{
+                        "type": "text",
+                        "text": "Only output the ocr result of user's uploaded image. If the image contains data structures like a graph or table, convert the info into text. If this is a image of an object, describe it as detailed as possible."
+                    }, {
+                        "type": "image_url",
+                        "image_url": {"url": image_data}
+                    }]
+                }],
+                "stream": False
+            }
             
-            # Proceed with image processing
+            # Add headers for non-base64 and non-S3 URLs
+            if not is_base64(image_data) and not is_s3_url:
+                openai_request["messages"][0]["content"][1]["image_url"]["headers"] = headers
+            
             response = await client.post(
                 OPENAI_API_URL,
-                json={
-                    "model": OPENAI_ENHANCE_MODEL,
-                    "messages": [{
-                        "role": "user",
-                        "content": [{
-                            "type": "text",
-                            "text": "Only output the ocr result of user's uploaded image. If the image contains data structures like a graph or table, convert the info into text. If this is a image of an object, describe it as detailed as possible."
-                        }, {
-                            "type": "image_url",
-                            "image_url": {
-                                "url": image_url,
-                                "headers": headers  # Add headers for the image URL
-                            }
-                        }]
-                    }],
-                    "stream": False
-                },
+                json=openai_request,
                 headers=get_headers(OPENAI_API_KEY),
                 timeout=API_TIMEOUT
             )
             response.raise_for_status()
             result = response.json()
             return result.get("choices", [{}])[0].get("message", {}).get("content", "")
+            
     except Exception as e:
         logger.error(f"Image processing error: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Image processing failed: {str(e)}")
