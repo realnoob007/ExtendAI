@@ -71,8 +71,20 @@ async def process_image(image_url: str) -> str:
         
         # Handle regular URL
         async with httpx.AsyncClient() as client:
-            # First check image size
-            head_response = await client.head(image_url, follow_redirects=True)
+            # Set headers for S3 presigned URLs
+            headers = {
+                "Accept": "*/*",
+                "Accept-Encoding": "gzip, deflate",
+                "Connection": "keep-alive",
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
+            }
+            
+            # First check image size with HEAD request
+            head_response = await client.head(
+                image_url,
+                headers=headers,
+                follow_redirects=True
+            )
             head_response.raise_for_status()
             
             # Check content length if available
@@ -97,7 +109,10 @@ async def process_image(image_url: str) -> str:
                             "text": "Only output the ocr result of user's uploaded image. If the image contains data structures like a graph or table, convert the info into text. If this is a image of an object, describe it as detailed as possible."
                         }, {
                             "type": "image_url",
-                            "image_url": {"url": image_url}
+                            "image_url": {
+                                "url": image_url,
+                                "headers": headers  # Add headers for the image URL
+                            }
                         }]
                     }],
                     "stream": False
