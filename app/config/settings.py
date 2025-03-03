@@ -34,7 +34,7 @@ VECTOR_CACHE_TTL = int(os.getenv("VECTOR_CACHE_TTL", str(2 * 60 * 60)))  # 2 hou
 
 # File size limits (in bytes)
 MAX_FILE_SIZE = int(os.getenv("MAX_FILE_SIZE", str(10 * 1024 * 1024)))  # 10MB default
-MAX_IMAGE_SIZE = int(os.getenv("MAX_IMAGE_SIZE", str(5 * 1024 * 1024)))  # 5MB default
+MAX_IMAGE_SIZE = int(os.getenv("MAX_IMAGE_SIZE", str(10 * 1024 * 1024)))  # 10MB default
 
 # Supported file formats
 SUPPORTED_IMAGE_FORMATS = {
